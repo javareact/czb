@@ -1,0 +1,40 @@
+{
+  "name": "javareact/czb",
+  "description": "车主邦PHP-SDK,Jiaolfei100 OpenApi SDK",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "车主邦",
+    "Jiaolfei100",
+    "OpenApi",
+    "SDK"
+  ],
+  "require": {
+    "php": ">=7.1",
+    "guzzlehttp/guzzle": "*",
+    "psr/log": "*",
+    "ext-json": "*",
+    "ext-openssl": "*",
+    "ext-iconv": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "JavaReact\\CzbApi\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\CzbApi\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "mockery/mockery": "^1.3",
+    "friendsofphp/php-cs-fixer": "^2.16",
+    "monolog/monolog": "*"
+  },
+  "scripts": {
+    "cs-fix": "php-cs-fixer fix $1",
+    "test": "phpunit --colors=always"
+  }
+}
