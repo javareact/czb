@@ -11,18 +11,20 @@ use JavaReact\CzbApi\Tools\Client;
  */
 class User extends Client
 {
-
     /**
      * 平台授权登录
-     * @param string $Account 充值号码
+     *
+     * @param int $platformType 渠道编码，对接时车主邦提供
+     * @param string $platformCode 平台用户唯一标识(手机号)
      * @return ApiResponse
      */
-    public function login($Account)
+    public function login(int $platformType, string $platformCode)
     {
         $params = [
-            'Account' => $Account,
+            'platformType' => $platformType,
+            'platformCode' => $platformCode,
         ];
-        return $this->request("Api/PayMobile.aspx", $params);
+        return $this->request("begin/platformLoginSimpleAppV4", $params);
     }
 
 }

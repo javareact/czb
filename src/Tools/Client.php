@@ -19,16 +19,16 @@ use Psr\Log\NullLogger;
 abstract class Client
 {
     /** @var string 默认网关 */
-    const DEFAULT_GATEWAY = 'http://open.czb.com/';
+    const DEFAULT_GATEWAY = 'https://test-mcs.czb365.com/services/v3/';
 
     /** @var string 测试网关 */
-    const TEST_GATEWAY = 'http://open.czb.com/';
+    const TEST_GATEWAY = 'https://test-mcs.czb365.com/services/v3/';
 
-    /** @var string API_ID */
-    private $apiId;
-
-    /** @var string API_KEY */
+    /** @var string apiKey */
     private $apiKey;
+
+    /** @var string apiSecret */
+    private $apiSecret;
 
     /**
      * @var Closure
@@ -42,15 +42,15 @@ abstract class Client
 
     /**
      * Client constructor.
-     * @param string $api_id API_ID
-     * @param string $app_key APP_KEY
+     * @param string $apiKey
+     * @param string $apiSecret
      * @param Closure|null $clientFactory
      * @param LoggerInterface|null $logger
      */
-    public function __construct(string $api_id, string $app_key, Closure $clientFactory = null, LoggerInterface $logger = null)
+    public function __construct(string $apiKey, string $apiSecret, Closure $clientFactory = null, LoggerInterface $logger = null)
     {
-        $this->apiId         = $api_id;
-        $this->apiKey        = $app_key;
+        $this->apiKey        = $apiKey;
+        $this->apiSecret     = $apiSecret;
         $this->clientFactory = $clientFactory;
         $this->logger        = $logger ?? new NullLogger();
     }
@@ -64,7 +64,7 @@ abstract class Client
      * @return ApiResponse
      * @throws ServerException
      */
-    protected function request(string $apiURI, array $parameters = [], array $optionPara = [], $needApiId = true): ApiResponse
+    protected function request(string $apiURI, array $parameters = []): ApiResponse
     {
         $this->logger->debug(sprintf("CzbApi Request [%s] %s", 'GET', $apiURI));
         try {
@@ -81,14 +81,12 @@ abstract class Client
             if (empty($client->getConfig('base_uri'))) {
                 $apiURI = self::DEFAULT_GATEWAY . $apiURI;//缺省网关
             }
-            $parameters['Sign'] = $this->getSign($parameters, $needApiId);
-            $options['verify']  = false;//关闭SSL验证
-            $needApiId && $parameters['APIID'] = $this->apiId;
-            if ($optionPara) {
-                $parameters = array_merge($parameters, $optionPara);//可选参数不参与签名
-            }
-            $options["query"] = $parameters;//查询字符串
-            $response         = $client->request('GET', $apiURI, $options);
+            $parameters['app_key']   = time();
+            $parameters['timestamp'] = time();
+            $parameters['sign']      = $this->getSign($parameters);
+            $options['verify']       = false;//关闭SSL验证
+            $options["query"]        = $parameters;//查询字符串
+            $response                = $client->request('GET', $apiURI, $options);
         } catch (TransferException $e) {
             $message = sprintf("Something went wrong when calling fulu (%s).", $e->getMessage());
             $this->logger->error($message);
@@ -105,34 +103,20 @@ abstract class Client
      * 获取签名
      *
      * @param array $parameters
-     * @param $needApiId
      * @return string
      */
-    protected function getSign(array $parameters, $needApiId): string
+    protected function getSign(array $parameters): string
     {
-        if (array_key_exists("Sign", $parameters)) {
-            unset($parameters["Sign"]);
+        if (array_key_exists("sign", $parameters)) {
+            unset($parameters["sign"]);
         }
-        return Sign::getSign($parameters, $needApiId ? $this->apiId : null, $needApiId ? $this->apiKey : null);
-    }
-
-    /**
-     * 验证签名
-     *
-     * @param array $parameters POST数组
-     * @return bool
-     */
-    public function verifySign(array $parameters)
-    {
-        if (!array_key_exists('Sign', $parameters) || empty($parameters['Sign'])) {
-            return false;
+        if (array_key_exists("token", $parameters)) {
+            unset($parameters["token"]);
         }
-        $oriSign = $parameters['Sign'];
-        $newSign = strtoupper(md5("APIID={$this->apiId}&Account={$parameters['Account']}&OrderID={$parameters['OrderID']}&OutID={$parameters['OutID']}&State={$parameters['State']}&TradeType={$parameters['TradeType']}&TotalPrice={$parameters['TotalPrice']}&APIKEY={$this->apiKey}"));
-        if ($oriSign === $newSign) {
-            return true;
+        if (array_key_exists("app_version", $parameters)) {
+            unset($parameters["app_version"]);
         }
-        return false;
+        return Sign::getSign($parameters, $this->apiSecret);
     }
 
 }

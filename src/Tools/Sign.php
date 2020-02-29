@@ -11,23 +11,19 @@ class Sign
 {
     /**
      * 计算签名
+     *
      * @param array $parameters
-     * @param $apiId
-     * @param $apiKey
+     * @param string $apiSecret
      * @return string
      */
-    public static function getSign(array $parameters, $apiId, $apiKey): string
+    public static function getSign(array $parameters, string $apiSecret): string
     {
         ksort($parameters, SORT_STRING);//不分大小写排序
-        //中文URL_ENCODE
-        $str = http_build_query($parameters);
-        if (!is_null($apiId)) {
-            $str = "APIID=$apiId&" . $str;
+        $str = '';
+        foreach ($parameters as $key => $val) {
+            $str .= $key . $val;
         }
-        if (!is_null($apiKey)) {
-            $str = rtrim($str, '&') . "&APIKEY=$apiKey";
-        }
-        //转大写
-        return strtoupper(md5($str));
+        $str = $apiSecret . $str . $apiSecret;
+        return strtolower(md5($str));
     }
 }
