@@ -59,14 +59,11 @@ abstract class Client
      * 发送请求
      * @param string $apiURI 请求地址
      * @param array $parameters 应用级参数
-     * @param array $optionPara 可选参数
-     * @param bool $needApiId APIID是否参与签名
      * @return ApiResponse
-     * @throws ServerException
      */
     protected function request(string $apiURI, array $parameters = []): ApiResponse
     {
-        $this->logger->debug(sprintf("CzbApi Request [%s] %s", 'GET', $apiURI));
+        $this->logger->debug(sprintf("CzbApi Request [%s] %s", 'POST', $apiURI));
         try {
             $clientFactory = $this->clientFactory;
             if ($clientFactory instanceof Closure) {
@@ -85,8 +82,8 @@ abstract class Client
             $parameters['timestamp'] = time();
             $parameters['sign']      = $this->getSign($parameters);
             $options['verify']       = false;//关闭SSL验证
-            $options["query"]        = $parameters;//查询字符串
-            $response                = $client->request('GET', $apiURI, $options);
+            $options["form_params"]  = $parameters;//application/x-www-form-urlencoded POST请求
+            $response                = $client->request('POST', $apiURI, $options);
         } catch (TransferException $e) {
             $message = sprintf("Something went wrong when calling fulu (%s).", $e->getMessage());
             $this->logger->error($message);
