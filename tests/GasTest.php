@@ -19,7 +19,8 @@ class GasTest extends BaseTest
      */
     public function testLogin()
     {
-        $this->client->login('', '');
+        $res = $this->client->login('', '');
+        var_export($res->result());
     }
 
     /**
@@ -27,7 +28,8 @@ class GasTest extends BaseTest
      */
     public function testQueryGasInfoListOilNoNew()
     {
-        $this->client->queryGasInfoListOilNoNew('');
+        $res = $this->client->queryGasInfoListOilNoNew('');
+        var_export($res->result());
     }
 
     /**
@@ -43,7 +45,8 @@ class GasTest extends BaseTest
      */
     public function testPlatformOrderInfoV2()
     {
-        $this->client->platformOrderInfoV2('', '', '');
+        $res = $this->client->platformOrderInfoV2('', '', '');
+        var_export($res->result());
     }
 
 }

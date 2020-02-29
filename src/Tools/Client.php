@@ -78,8 +78,8 @@ abstract class Client
             if (empty($client->getConfig('base_uri'))) {
                 $apiURI = self::DEFAULT_GATEWAY . $apiURI;//缺省网关
             }
-            $parameters['app_key']   = time();
-            $parameters['timestamp'] = time();
+            $parameters['app_key']   = $this->apiKey;
+            $parameters['timestamp'] = bcmul(strval(time()), '1000', 0);
             $parameters['sign']      = $this->getSign($parameters);
             $options['verify']       = false;//关闭SSL验证
             $options["form_params"]  = $parameters;//application/x-www-form-urlencoded POST请求

@@ -15,7 +15,8 @@
     "psr/log": "*",
     "ext-json": "*",
     "ext-openssl": "*",
-    "ext-iconv": "*"
+    "ext-iconv": "*",
+    "ext-bcmath": "*"
   },
   "autoload": {
     "psr-4": {
