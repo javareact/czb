@@ -52,7 +52,7 @@ class Gas extends Client
             'platformType' => $platformType,
             'phone'        => $phone,
         ];
-        return $this->request("gas/queryGasInfoListOilNoNew", $params);
+        return $this->request("gas/queryPriceByPhone", $params);
     }
 
     /**
