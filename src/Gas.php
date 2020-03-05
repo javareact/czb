@@ -38,8 +38,9 @@ class Gas extends Client
 
     /**
      * 根据用户查询油站状态和油价<p>
+     *
      * <font color="red">该接口调用前需调用用户接口中“平台授权登录”接口，不需传token参数</font>
-     * @param string $gasIds
+     * @param string $gasIds 用英文逗号隔开
      * @param string $platformType
      * @param string $phone
      * @return Tools\ApiResponse
@@ -47,7 +48,7 @@ class Gas extends Client
     public function queryPriceByPhone(string $gasIds, string $platformType, string $phone)
     {
         $params = [
-            'channelId'    => $gasIds,
+            'gasIds'       => $gasIds,
             'platformType' => $platformType,
             'phone'        => $phone,
         ];
